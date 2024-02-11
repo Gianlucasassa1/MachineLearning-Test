@@ -134,7 +134,7 @@ class LR_Classifier:
                 loss_c1 += np.logaddexp(0, -zi * (np.dot(w.T, self.DTR[:, i:i + 1]) + b))
             else:
                 zi = -1
-                loss_c0 += np.logaddexp(0, -zi * (np.dot(w.T, self.DTR[:, i:i + 1]) + b)))
+                loss_c0 += np.logaddexp(0, -zi * (np.dot(w.T, self.DTR[:, i:i + 1]) + b))
 
                 J = regularization + (self.piT / self.nT) * loss_c1 + (1 - self.piT) / self.nF * loss_c0
         return J
@@ -144,6 +144,7 @@ class LR_Classifier:
         self.DTR = DTR
         self.LTR = LTR
         x0 = np.zeros(DTR.shape[0] + 1)
+
         self.nT = len(np.where(LTR == 1)[0])
         self.nF = len(np.where(LTR == 0)[0])
 

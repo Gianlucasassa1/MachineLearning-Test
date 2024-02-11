@@ -2,7 +2,7 @@
 import numpy
 from Preprocess.PCA import *
 from Preprocess.z_norm import znorm_impl,normalize_zscore
-from Models.Gaussian.new_MVG_model import *
+from Models.Gaussian.utils import *
 from Evaluation.evaluation import *
 
 #Non ancora visti

@@ -7,8 +7,8 @@ from Train.train import *
 from Preprocess.feature_analysis import *
 from Preprocess.PCA import *
 from Preprocess.LDA import *
-from Models.Gaussian.new_MVG_model import *
-from Models.Gaussian.class_MVG import *
+from Models.Gaussian.utils import *
+from Models.Gaussian.Gaussian import *
 from Models.LogisticRegression.logreg import LR_Classifier, QuadraticLR_Classifier
 from Models.SupportVector.svm import SVMClass
 from Models.SupportVector.svm_kernel import SVMClass
@@ -99,16 +99,18 @@ def main(type, mode):
     #
     #
     #
-    #
-    #   _        _____
-    #  | |      |  __ \
-    #  | |      | |__) |
-    #  | |      |  _  /
-    #  | |____  | | \ \
-    #  |______| |_|  \_\
-    #
 
     if mode == 'train':
+
+        # Gaussian
+        #   _        _____
+        #  | |      |  __ \
+        #  | |      | |__) |
+        #  | |      |  _  /
+        #  | |____  | | \ \
+        #  |______| |_|  \_\
+        #
+
         if type == "MVG":
             prior, Cfp, Cfn = (0.5, 10, 1)
             params = {"K": 5, "pca": 6, "pi": 0.5, "costs": (1, 1)}
@@ -170,15 +172,12 @@ def main(type, mode):
                 #  plt.show()
 
         # Logistic Regression
-
-        #
         #    _        _____
         #  | |      |  __ \
         #  | |      | |__) |
         #  | |      |  _  /
         #  | |____  | | \ \
         #  |______| |_|  \_\
-        #
         #
 
         if type == "LR":
@@ -250,14 +249,12 @@ def main(type, mode):
                     #  plt.show()
 
         # Logistic Regression - Quadratic
-        #
         #   _        _____                  ____                        _                  _     _
         #  | |      |  __ \                / __ \                      | |                | |   (_)
         #  | |      | |__) |    ______    | |  | |  _   _    __ _    __| |  _ __    __ _  | |_   _    ___
         #  | |      |  _  /    |______|   | |  | | | | | |  / _` |  / _` | | '__|  / _` | | __| | |  / __|
         #  | |____  | | \ \               | |__| | | |_| | | (_| | | (_| | | |    | (_| | | |_  | | | (__
         #  |______| |_|  \_\               \___\_\  \__,_|  \__,_|  \__,_| |_|     \__,_|  \__| |_|  \___|
-        #
         #
 
         if type == "QLR":
@@ -337,16 +334,13 @@ def main(type, mode):
             plt.title(0.33)
             plt.savefig(path)
 
-        #
+        # Support Vector Machine
         #    _____  __      __  __  __
         #   / ____| \ \    / / |  \/  |
         #  | (___    \ \  / /  | \  / |
         #   \___ \    \ \/ /   | |\/| |
         #   ____) |    \  /    | |  | |
         #  |_____/      \/     |_|  |_|
-        #
-        #
-        #
         #
 
         if type == "SVM":
@@ -429,7 +423,7 @@ def main(type, mode):
 
                 ############ KERNEL SVM  ############
 
-        #
+        # Support Vector Machine - Kernel
         #    _____  __      __  __  __                _  __                               _
         #   / ____| \ \    / / |  \/  |              | |/ /                              | |
         #  | (___    \ \  / /  | \  / |    ______    | ' /    ___   _ __   _ __     ___  | |
@@ -571,15 +565,13 @@ def main(type, mode):
 
                         ###############   GMM   ###############
 
-        #
+        # Gaussian Mixture Models
         #     _____   __  __   __  __
         #   / ____| |  \/  | |  \/  |
         #  | |  __  | \  / | | \  / |
         #  | | |_ | | |\/| | | |\/| |
         #  | |__| | | |  | | | |  | |
         #   \_____| |_|  |_| |_|  |_|
-        #
-        #
         #
 
         if type == "GMM":
@@ -723,11 +715,7 @@ def main(type, mode):
                         plt.savefig(path)
                         #  plt.show()
 
-    #
-    #
-    #
-    #
-    #
+    # Calibration
     #         CCCCCCCCCCCCC               AAA               LLLLLLLLLLL             IIIIIIIIIIBBBBBBBBBBBBBBBBB   RRRRRRRRRRRRRRRRR                  AAA               TTTTTTTTTTTTTTTTTTTTTTTIIIIIIIIII     OOOOOOOOO     NNNNNNNN        NNNNNNNN
     #      CCC::::::::::::C              A:::A              L:::::::::L             I::::::::IB::::::::::::::::B  R::::::::::::::::R                A:::A              T:::::::::::::::::::::TI::::::::I   OO:::::::::OO   N:::::::N       N::::::N
     #    CC:::::::::::::::C             A:::::A             L:::::::::L             I::::::::IB::::::BBBBBB:::::B R::::::RRRRRR:::::R              A:::::A             T:::::::::::::::::::::TI::::::::I OO:::::::::::::OO N::::::::N      N::::::N
@@ -745,16 +733,6 @@ def main(type, mode):
     #      CCC::::::::::::C A:::::A                 A:::::A L::::::::::::::::::::::LI::::::::IB::::::::::::::::B  R::::::R     R:::::R A:::::A                 A:::::A       T:::::::::T      I::::::::I   OO:::::::::OO   N::::::N        N::::::N
     #         CCCCCCCCCCCCCAAAAAAA                   AAAAAAALLLLLLLLLLLLLLLLLLLLLLLLIIIIIIIIIIBBBBBBBBBBBBBBBBB   RRRRRRRR     RRRRRRRAAAAAAA                   AAAAAAA      TTTTTTTTTTT      IIIIIIIIII     OOOOOOOOO     NNNNNNNN         NNNNNNN
     #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-    #
-
-    #####################                       COST AND CALIBRATION         #######################
 
     ## ROC and Bayes error ###
 
@@ -767,8 +745,8 @@ def main(type, mode):
         ##### CALIBRATE USING A LR #####
 
         ### BEST QUAD LOG REG ###
-        prior, Cfp, Cfn = (0.5, 10, 1)
 
+        prior, Cfp, Cfn = (0.5, 1, 1)
         lambda_ = 0.01
         pi_tilde = (prior * Cfn) / (prior * Cfn + (1 - prior) * Cfp)
         QuadLogReg = QuadraticLR_Classifier(lambda_, pi_tilde)
@@ -794,7 +772,7 @@ def main(type, mode):
 
         #                                             ### BEST SVM  ###
 
-        prior, Cfp, Cfn = (0.5, 10, 1)
+        prior, Cfp, Cfn = (0.5, 1, 1)
         K_svm = 0
         C = 10
         mode = "rbf"
@@ -819,7 +797,7 @@ def main(type, mode):
         svm_FPR, svm_TPR = ROC_plot(thresholds, post_prob, svm_labels)
 
         #                                             ### BEST GMM  ###
-        prior, Cfp, Cfn = (0.5, 10, 1)
+        prior, Cfp, Cfn = (0.5, 1, 1)
         target_max_comp = 2
         not_target_max_comp = 8
         mode_target = "diag"
@@ -851,7 +829,7 @@ def main(type, mode):
         ################################################################# EVALUATION TEST ###########################################################
 
         ### QUAD LOG REG BEST CONFIG  ###
-        prior, Cfp, Cfn = (0.5, 10, 1)
+        prior, Cfp, Cfn = (0.5, 1, 1)
         pca = 6
         znorm = False
         lambda_ = 0.01
@@ -878,7 +856,7 @@ def main(type, mode):
         print("DCF min: " + str(DCF_min))
 
         ####### SVM REG BEST CONFIG  ########
-        prior, Cfp, Cfn = (0.5, 10, 1)
+        prior, Cfp, Cfn = (0.5, 1, 1)
         pca = 6
         znorm = False
         K_svm = 0
@@ -904,8 +882,8 @@ def main(type, mode):
         ##DCF_min_svm = 0.2411###
 
         pred = [1 if x > 0 else 0 for x in svm_scores]
-        # acc,_ = accuracy(pred,LTE)
-        # print("Accuracy: "+str(100-acc))
+        acc, _ = accuracy(pred, LTE)
+        print("Accuracy: " + str(100 - acc))
         print("DCF min: " + str(DCF_min))
 
         ######## GMM BEST CONFIG  #################

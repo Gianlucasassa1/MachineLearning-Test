@@ -1,4 +1,4 @@
-from . import new_MVG_model as model_utils
+from . import utils as model_utils
 import numpy as np
 
 class GaussianClassifier:

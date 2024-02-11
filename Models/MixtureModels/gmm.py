@@ -1,7 +1,7 @@
 import numpy as np
 import scipy
 import math
-from Models.Gaussian.new_MVG_model import *
+from Models.Gaussian.utils import *
 
 def vcol(vector):
     return vector.reshape((vector.shape[0],1)) 
