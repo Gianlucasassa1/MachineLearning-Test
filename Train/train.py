@@ -109,7 +109,8 @@ def trainGaussian(DTR, LTR, file):
         # Crea la nuova cartella
         os.makedirs(folder_path, exist_ok=True)
 
-        plt.xlabel("PCA dimensions")
+        #plt.xlabel("PCA dimensions")
+        plt.xlabel("")
         plt.ylabel("DCF_min")
         plt.title(model.mode)
         path = "Images/Gaussian/" + str(model.mode)
@@ -410,7 +411,7 @@ def trainKSVM(DTR, LTR, file):
                         results_key = f"PCA {pca if pca is not None else 'None'} {kernel} {kernel_string}{ci} Znorm {znorm}"
                         plt.semilogx(C_values, results[results_key], label=label)
 
-                plt.xlabel("C Value")
+                #plt.xlabel("")
                 plt.ylabel("Min DCF")
                 plt.legend()
                 plt.title(f"{kernel.capitalize()} Kernel with {kernel_string}{ci} (piT={piT})")
@@ -474,7 +475,7 @@ def trainGMM(DTR, LTR, file):
                     plt.plot(x_values, min_DCF_values, label=label)
                     plt.xticks(x_values, x_values)
 
-            plt.xlabel("Components")
+            #plt.xlabel("Number of C")
             plt.ylabel("Min DCF")
             plt.legend()
             string_title = "GMM"
