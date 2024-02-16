@@ -32,7 +32,7 @@ def loglikelihood(X, m_ML, C_ML):
     return np.sum(logpdf_GAU_ND(X, m_ML, C_ML))
 
 
-def logpdf_GMM(X, gmm):  # gmm list of tuple
+def logpdf_GMM(X, gmm):
     num_components = len(gmm)
     logS = np.empty((num_components, X.shape[1]))
 
@@ -97,7 +97,7 @@ class GMMClassifier:
         llr = self.predict_log(self.model, DTE, [1 - self.eff_prior, self.eff_prior])
         return llr
 
-    def EM_GMM(self, X, gmm, psi):  # gmm list of tuple
+    def GMMExpectationMaximization(self, X, gmm, psi):
         while True:
             num_components = len(gmm)
             logS = np.empty((num_components, X.shape[1]))
@@ -148,7 +148,7 @@ class GMMClassifier:
         # print(np.mean(new_loss))
         return gmm
 
-    def EM_Diag_GMM(self, X, gmm, psi):  # gmm list of tuple
+    def GMMDiagExpectationMaximization(self, X, gmm, psi):  # gmm list of tuple
         while True:
             num_components = len(gmm)
             logS = np.empty((num_components, X.shape[1]))
@@ -202,7 +202,7 @@ class GMMClassifier:
         # print(np.mean(new_loss))
         return gmm
 
-    def EM_TiedCov_GMM(self, X, gmm, psi):  # gmm list of tuple
+    def GMMTiedExpectationMaximization(self, X, gmm, psi):
         while True:
             num_components = len(gmm)
             logS = np.empty((num_components, X.shape[1]))
@@ -277,7 +277,7 @@ class GMMClassifier:
         gmm_start.append((new_w, vcol(mu_new_2), C_start))
 
         while True:
-            gmm_start = self.EM_GMM(X, gmm_start, psi)
+            gmm_start = self.GMMExpectationMaximization(X, gmm_start, psi)
             num_components = len(gmm_start)
 
             if num_components == num_components_max:
@@ -319,7 +319,7 @@ class GMMClassifier:
         gmm_start.append((new_w, vcol(mu_new_2), C_start))
 
         while True:
-            gmm_start = self.EM_Diag_GMM(X, gmm_start, psi)
+            gmm_start = self.GMMDiagExpectationMaximization(X, gmm_start, psi)
             num_components = len(gmm_start)
             if num_components == num_components_max:
                 break
@@ -359,7 +359,7 @@ class GMMClassifier:
         gmm_start.append((new_w, vcol(mu_new_1), C_start))
         gmm_start.append((new_w, vcol(mu_new_2), C_start))
         while True:
-            gmm_start = self.EM_TiedCov_GMM(X, gmm_start, psi)
+            gmm_start = self.GMMTiedExpectationMaximization(X, gmm_start, psi)
             num_components = len(gmm_start)
 
             if num_components == num_components_max:
@@ -422,175 +422,20 @@ class GMMClassifier:
 
         # predicted_label = np.argmax(np.array(SPost),axis=0)
 
-        return llr  # ravel per appiattire il vettore e farlo combaciare con labels per calcolo accuracy
+        return llr
 
-# def accuracy(predicted_labels,original_labels):
-#     if len(predicted_labels)!=len(original_labels):
-#         return
-#     total_samples = len(predicted_labels)
-
-
-#     correct = (predicted_labels==original_labels).sum()
-#     return (correct/total_samples)*100
+def accuracy(predicted_labels,original_labels):
+    if len(predicted_labels)!=len(original_labels):
+        return
+    total_samples = len(predicted_labels)
 
 
-# def error_rate(predicted_labels,original_labels):
-#     return 100 - accuracy(predicted_labels,original_labels)
-
-# def K_fold(K,train_set,labels,num_classes,prior):
-
-#     # Set random seed for reproducibility
-#     np.random.seed(0)
-#     # Create an index array
-#     indices = np.arange(train_set.shape[1])
-
-#     # Shuffle the index array
-#     np.random.shuffle(indices)
-#     # Rearrange the features and labels based on the shuffled indices
-#     train_set = train_set[:, indices]
-#     labels = labels[indices]
+    correct = (predicted_labels==original_labels).sum()
+    return (correct/total_samples)*100
 
 
-#     fold_size = train_set.shape[1]//K
-#     #results = np.array((4,train_set.shape[1])) #per ogni riga gli score del modello testato per noi proviamo 4 modelli
-#     results1 = []
-#     results2 = []
-#     results3 = []
-#     results4 = []
-#     results5 = []
-#     results6 = []    
-#     preds = []
-#     for i in range(K):
-#         print("This is the "+str(i+1)+"-th FOLD")
-#         start = i*fold_size
-#         end = (i+1)*fold_size
-
-#         val_range = np.in1d(range(train_set.shape[1]),range(int(start),int(end)))
-
-#         curr_tr_set = train_set[:,np.invert(val_range)]
-#         curr_tr_labels = labels[np.invert(val_range)]
-
-#         curr_val_set = train_set[:,val_range]
-#         curr_val_labels = labels[val_range]
-
-#         model1 = GMM_TiedCov_classifier(curr_tr_set, curr_tr_labels, num_classes,num_components_max=[2,1])
-#         #model2 = GMM_Diag_classifier(curr_tr_set, curr_tr_labels, num_classes,num_components_max=[4,2])
-#         #model3 = GMM_TiedCov_classifier(curr_tr_set, curr_tr_labels, num_classes,num_components_max=[4,2])
-#         #model4 = GMM_classifier(curr_tr_set, curr_tr_labels, num_classes,num_components_max=[8,2])
-#         #model5 = GMM_Diag_classifier(curr_tr_set, curr_tr_labels, num_classes,num_components_max=[8,2])
-#         #model6 = GMM_TiedCov_classifier(curr_tr_set, curr_tr_labels, num_classes,num_components_max=[8,2])
+def error_rate(predicted_labels,original_labels):
+    return 100 - accuracy(predicted_labels,original_labels)
 
 
-#         pred_labels1,llr1 = predict_log(model1, curr_val_set, prior)
-#         #pred_labels2,llr2 = predict_log(model2, curr_val_set, prior)
-#         #pred_labels3,llr3 = predict_log(model3, curr_val_set, prior)
-#         #pred_labels4,llr4 = predict_log(model4, curr_val_set, prior)
-#         #pred_labels5,llr5 = predict_log(model5, curr_val_set, prior)
-#         #pred_labels6,llr6 = predict_log(model6, curr_val_set, prior)
 
-
-#         '''
-#         acc1 = accuracy(pred_labels1, curr_val_labels)
-#         acc2 = accuracy(pred_labels2, curr_val_labels)
-#         acc3 = accuracy(pred_labels3, curr_val_labels)
-#         acc4 = accuracy(pred_labels4, curr_val_labels)
-#         '''
-
-
-#         results1.append(llr1)
-#         preds.append(pred_labels1)
-#         #results2.append(llr2)
-#         #results3.append(llr3)
-#         #results4.append(llr4)
-#         #results5.append(llr5)
-#         #results6.append(llr6)
-
-
-#     #results = np.array(results)    
-#     #results = results.reshape((K,4))    #sulle righe l'esito della validation per il k_esimo-fold per ciascun modello 
-
-#     #results_per_model = results.mean(0) #chiedi al prof se la logica è corretta
-
-
-#     #best_model_id = np.argmax(results_per_model)
-
-#     confusion_matrix = metrics.compute_confusion_matrix(labels[0:2320], np.concatenate(preds), num_classes)
-#     dcf1 = metrics.compute_DCF(1/11, 1, 1, confusion_matrix)
-#     metrics.plot_Bayes_error(np.concatenate(results1), labels[0:2320])
-#     #dcfmin2 = metrics.compute_DCFmin(np.concatenate(results2), labels[0:2320], prior[1], 1, 1)
-#     #dcfmin3 = metrics.compute_DCFmin(np.concatenate(results3), labels[0:2320], prior[1], 1, 1)
-#     #dcfmin4 = metrics.compute_DCFmin(np.concatenate(results4), labels[0:2320], prior[1], 1, 1)
-#     #dcfmin5 = metrics.compute_DCFmin(np.concatenate(results5), labels[0:2320], prior[1], 1, 1)
-#     #dcfmin6 = metrics.compute_DCFmin(np.concatenate(results6), labels[0:2320], prior[1], 1, 1)
-
-
-#     #predicted_labels = np.where(np.concatenate(results1) > -1*np.log(prior[1]/prior[0]), 1, 0)
-#     #print(error_rate(predicted_labels, labels[0:2320]))
-#     print('GMM DCF = '+str(dcf1))
-
-
-# if __name__ == '__main__':
-#     # DTR, LTR = fingerprints_dataset.load("Train.txt")
-#     # DTE, LTE = fingerprints_dataset.load("Test.txt")
-#     # '''
-#     # model = GMM_classifier(DTR, LTR, num_classes=2,num_components_max=2)
-#     # preds = predict_log(model, DTE, prior=[0.5, 0.5])
-#     # print(preds)
-#     # print(LTE)
-#     # print(error_rate(preds, LTE))'''
-#     # # DTR,P = PCA.pca(DTR, 9)
-#     # # DTE = np.dot(P.T, DTE)
-
-#     # # eff_prior=1/11 #(0.5,cfn=1,cfp=10)
-#     # '''
-#     # model1 = GMM_classifier(DTR, LTR, num_classes=2,num_components_max=[8,1])
-#     # model2 = GMM_Diag_classifier(DTR, LTR, num_classes=2,num_components_max=[8,1])
-#     # model3 = GMM_TiedCov_classifier(DTR, LTR, num_classes=2,num_components_max=[8,1])
-
-#     # pred_labels1,llr1 = predict_log(model1, DTE, [1-eff_prior,eff_prior])
-#     # confusion_matrix1 = metrics.compute_confusion_matrix(LTE, pred_labels1, num_classes=2)
-
-#     # dcf1 = metrics.compute_DCF(1/11, 1, 1, confusion_matrix1)
-#     # print("-------")
-#     # print("DCF GMM: "+str(dcf1))
-
-#     # dcfmin1 = metrics.compute_DCFmin(llr1, LTE, 1/11, 1, 1)
-#     # print("MIN DCF GMM: "+str(dcfmin1))
-#     # #----------------------------------------
-
-
-#     # pred_labels2,llr2 = predict_log(model2, DTE, [1-eff_prior,eff_prior])
-#     # confusion_matrix2 = metrics.compute_confusion_matrix(LTE, pred_labels2, num_classes=2)
-
-#     # dcf2 = metrics.compute_DCF(1/11, 1, 1, confusion_matrix2)
-#     # print("-------")
-#     # print("DCF DIAG: "+str(dcf2))
-
-#     # dcfmin2 = metrics.compute_DCFmin(llr2, LTE, 1/11, 1, 1)
-#     # print("MIN DCF DIAG: "+str(dcfmin2))
-#     # #-----------------------------------------
-
-
-#     # pred_labels3,llr3 = predict_log(model3, DTE, [1-eff_prior,eff_prior])
-#     # confusion_matrix3 = metrics.compute_confusion_matrix(LTE, pred_labels3, num_classes=2)
-
-#     # dcf3 = metrics.compute_DCF(1/11, 1, 1, confusion_matrix3)
-#     # print("-------")
-#     # print("DCF TIED: "+str(dcf3))
-
-#     # dcfmin3 = metrics.compute_DCFmin(llr3, LTE, 1/11, 1, 1)
-#     # print("MIN DCF TIED: "+str(dcfmin3))
-#     # '''
-#     # # K_fold(10, DTR, LTR, num_classes=2, prior=[1-eff_prior,eff_prior])
-
-#     #GMM_classifier(DTR, LTR, num_classes=2,num_components_max=[8,1])
-#     X = np.load("Data/GMM_data_4D.npy")
-#     gmm = load_gmm("Data/GMM_4D_3G_init.json")
-#     ll_res = np.load("Data/GMM_4D_3G_init_ll.npy")
-
-#     gmm_em_res = load_gmm("Data/GMM_4D_3G_EM.json")
-
-#     gmm_em =  EM_GMM(X,gmm,0.01)
-
-#     print(gmm_em)
-#     print(gmm_em_res)

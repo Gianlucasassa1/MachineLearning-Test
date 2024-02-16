@@ -4,7 +4,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-# this function compute the confusion_matrix confronting predictions on the classes and actual labels
 def confusion_matrix(pred, LTE):
     nclasses = int(np.max(LTE)) + 1
     matrix = np.zeros((nclasses, nclasses))
@@ -15,7 +14,6 @@ def confusion_matrix(pred, LTE):
     return matrix
 
 
-# compute the posterior_probabilities adding Cfn and Cfp contributions
 def binary_posterior_prob(llr, prior, Cfn, Cfp):
     new_llr = np.zeros(llr.shape);
     for i in range(len(llr)):
@@ -26,7 +24,6 @@ def binary_posterior_prob(llr, prior, Cfn, Cfp):
     return new_llr
 
 
-# compute the un-normalized DCF
 def binary_DCFu(prior, Cfn, Cfp, cm):
     FNR = cm[0, 1] / (cm[0, 1] + cm[1, 1])
     FPR = cm[1, 0] / (cm[1, 0] + cm[0, 0])
@@ -36,8 +33,7 @@ def binary_DCFu(prior, Cfn, Cfp, cm):
     return DCFu
 
 
-# here we can plot the ROC plot which shows how the FPR and TPR change according to the current threshold value
-def ROC_plot(thresholds, post_prob, LTE):
+def ROC(thresholds, post_prob, LTE):
     save_path = "Images/Evaluation/ROC/"
     FNR = []
     FPR = []
@@ -64,7 +60,6 @@ def ROC_plot(thresholds, post_prob, LTE):
     return FPR, TPR
 
 
-# compute Bayes error plot
 def Bayes_plot(llr, LTE):
     effPriorLogOdds = np.linspace(-3, 3, 21)
     DCF_effPrior = {}

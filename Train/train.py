@@ -6,13 +6,13 @@ from Models.Gaussian.Gaussian import *
 from Evaluation.evaluation import *
 from Evaluation.evaluation import *
 from Models.Gaussian.utils import *
-from Models.LogisticRegression.logreg import LR_Classifier, QuadraticLR_Classifier
-from Models.SupportVector.svm import SVMClassifier
-from Models.SupportVector.svm_kernel import SVMKernelClassifier
-from Models.MixtureModels.gmm import GMMClassifier
-from Models.SupportVector.svm import SVMClassifier
-from Models.SupportVector.svm_kernel import SVMKernelClassifier
-from Models.MixtureModels.gmm import GMMClassifier
+from Models.LogisticRegression.LogisticRegression import LR_Classifier, QuadraticLR_Classifier
+from Models.SupportVector.SVM import SVMClassifier
+from Models.SupportVector.SVMKernel import SVMKernelClassifier
+from Models.MixtureModels.GMM import GMMClassifier
+from Models.SupportVector.SVM import SVMClassifier
+from Models.SupportVector.SVMKernel import SVMKernelClassifier
+from Models.MixtureModels.GMM import GMMClassifier
 
 
 def train_KFold(D, L, classifier, options):

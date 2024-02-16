@@ -114,7 +114,7 @@ class QuadraticLR_Calibration:
         return llr
 
 
-def kfold_calib(D, L, classifier, params, calibrated=False):
+def CalibrationKFold(D, L, classifier, params, calibrated=False):
     K = params["K"]
     #K = 2
     pi = params["pi"]
@@ -168,7 +168,7 @@ def kfold_calib(D, L, classifier, params, calibrated=False):
     # plot the ROC BEFORE calibration
     post_prob = binary_posterior_prob(scores,pi,cfn,cfp)
     thresholds = np.sort(post_prob)
-    ROC_plot(thresholds, post_prob, labels)
+    ROC(thresholds, post_prob, labels)
 
     DTRc = scores[:int(len(scores) * 0.7)]
     DTEc = scores[int(len(scores) * 0.7):]
