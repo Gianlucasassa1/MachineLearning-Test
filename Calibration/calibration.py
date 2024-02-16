@@ -18,7 +18,7 @@ def num_samples(dataset):
 
 # is a function absolutely similar to the classic linear LR but with a logistic_reg_calibration function added
 
-class LRCalibrClass:
+class QuadraticLR_Calibration:
     def __init__(self, l, piT):
         self.l = l
         self.DTR = []
@@ -116,7 +116,7 @@ class LRCalibrClass:
 
 def kfold_calib(D, L, classifier, params, calibrated=False):
     K = params["K"]
-    K = 2
+    #K = 2
     pi = params["pi"]
     (cfn, cfp) = params["costs"]
     pca = params["pca"]
@@ -162,12 +162,13 @@ def kfold_calib(D, L, classifier, params, calibrated=False):
     DCF_effPrior, DCF_effPrior_min = Bayes_plot(scores, labels)
     DCF_effPrior_return = DCF_effPrior
     DCF_effPrior_min_return = DCF_effPrior_min
-    print(DCF_effPrior)
-    print(DCF_effPrior_min)
+    print(f"DCF_effPrior pre calib: {DCF_effPrior}")
+    print(f"DCF_effPrior_min pre calib: {DCF_effPrior_min}\n\n")
+    # print(f"DCF_effPrior_min inside calib: {DCF_effPrior_min}")
     # plot the ROC BEFORE calibration
-    # post_prob = binary_posterior_prob(scores,pi,cfn,cfp)
-    # thresholds = np.sort(post_prob)
-    # ROC_plot(thresholds,post_prob,labels)
+    post_prob = binary_posterior_prob(scores,pi,cfn,cfp)
+    thresholds = np.sort(post_prob)
+    ROC_plot(thresholds, post_prob, labels)
 
     DTRc = scores[:int(len(scores) * 0.7)]
     DTEc = scores[int(len(scores) * 0.7):]
@@ -176,15 +177,21 @@ def kfold_calib(D, L, classifier, params, calibrated=False):
     estimated_w, estimated_b = logObj.logistic_reg_calibration(np.array([DTRc]), LTRc,
                                                                np.array([DTEc]))
     print("estimated_w: " + str(estimated_w))
-    print("estimated_b: " + str(estimated_b))
+    print("estimated_b: " + str(estimated_b) + "\n\n")
     # (DTRc,LTRc), (DTEc,LTEc)= split_db_2to1(scores, labels)
     # estimated_b, estimated_w = logObj.train(DTRc,LTRc)
 
     scores_append = scores.reshape((1, scores.size))
     final_score = np.dot(estimated_w.T, scores_append) + estimated_b
-    print("final score: ")
-    print(final_score)
+    print(f"final score: {final_score}")
+    #print(final_score)
+
+    print(f"DCF_effPrior pre calib (Bayes plot): {DCF_effPrior}")
+    print(f"DCF_effPrior_min pre calib (Bayes plot): {DCF_effPrior_min}\n\n")
+
+
     DCF_effPrior, DCF_effPrior_min = Bayes_plot(final_score, labels)
-    print(DCF_effPrior)
-    print(DCF_effPrior_min)
+    # print(f"DCF_effPrior_min inside calib: {DCF_effPrior_min}")
+    print(f"DCF_effPrior post calib (Bayes plot): {DCF_effPrior}")
+    print(f"DCF_effPrior_min post calib (Bayes plot): {DCF_effPrior_min}\n\n")
     return DCF_effPrior_return, DCF_effPrior_min_return, scores, final_score, labels

@@ -21,26 +21,53 @@ class QuadraticLR_Classifier:
     # Funzione per calcolare il gradiente della funzione obiettivo della Quadratic Logistic Regression
     def gradient_test(self, DTR, LTR, l, pt, nt, nf):
         z = np.empty((LTR.shape[0]))
-        z = 2 * LTR - 1  # Trasformazione delle etichette in valori z = {-1, 1}
+        z = 2 * LTR - 1
 
         def gradient(v):
+            # print("in gradient")
+            # grad = np.array( [derivative_w(v),derivative_b(v)], dtype = np.float64)
+            # print("derivative w: ", derivative_w(v).size)        # print("derivative b: ", derivative_b(v).size)
             w, b = v[0:-1], v[-1]
-            first_term = l * w  # Termine di regolarizzazione L2
-            second_term = 0  # Termine per i campioni della classe positiva
-            third_term = 0  # Termine per i campioni della classe negativa
+            # print("w shape: ", w.size)        #print("w", w)
+            # derivata rispetto a w        first_term = l*w
 
-            for i in range(DTR.shape[1]):
+            second_term = 0
+            third_term = 0
+
+            # nt = self.nt
+            # nf = self.nf
+            # empirical prior        pt=nt/DTR.shape[1]
+            first_term = l * w
+            # print("size di DTR: "+str(DTR.shape))
+            # print("size di z: "+str(z.shape))
+            for i in range(DTR.shape[1]):  # S=DTR[:,i]
                 S = np.dot(w.T, DTR[:, i]) + b
                 ziSi = np.dot(z[i], S)
                 if LTR[i] == 1:
-                    internal_term = np.dot(np.exp(-ziSi), (np.dot(-z[i], DTR[:, i]))) / (1 + np.exp(-ziSi))
+                    internal_term = np.dot(np.exp(-ziSi), (np.dot(-z[i], DTR[:, i]))) / (
+                                1 + np.exp(-ziSi))  # print(1+np.exp(-ziSi))
                     second_term += internal_term
                 else:
                     internal_term_2 = np.dot(np.exp(-ziSi), (np.dot(-z[i], DTR[:, i]))) / (1 + np.exp(-ziSi))
                     third_term += internal_term_2
+            # derivative_w= first_term + (pi/nt)*second_term + (1-pi)/(nf) * third_term
+            derivative_w = first_term + (pt / nt) * second_term + (1 - pt) / (nf) * third_term
+            # derivata rispetto a b
+            first_term = 0
+            second_term = 0
 
-            derivative_w = first_term + (pt / nt) * second_term + (1 - pt) / nf * third_term
-            derivative_b = (pt / nt) * first_term + (1 - pt) / nf * second_term
+            for i in range(DTR.shape[1]):  # S=DTR[:,i]
+                S = np.dot(w.T, DTR[:, i]) + b
+                ziSi = np.dot(z[i], S)
+                if LTR[i] == 1:
+                    internal_term = (np.exp(-ziSi) * (-z[i])) / (1 + np.exp(-ziSi))
+                    first_term += internal_term
+                else:
+                    internal_term_2 = (np.exp(-ziSi) * (-z[i])) / (1 + np.exp(-ziSi))
+                    second_term += internal_term_2
+
+            # derivative_b= (pi/nt)*first_term + (1-pi)/(nf) * second_term
+            derivative_b = (pt / nt) * first_term + (1 - pt) / (nf) * second_term
             grad = np.hstack((derivative_w, derivative_b))
             return grad
 
@@ -48,53 +75,76 @@ class QuadraticLR_Classifier:
 
     # Funzione per calcolare la funzione obiettivo della Quadratic Logistic Regression (da minimizzare)
     def quad_logreg_obj(self, v):
+        # print("In quad_logreg_obj")
+        loss = 0
+        loss_c0 = 0
+        loss_c1 = 0
+        # for each possible v value in the current iteration (which corresponds to specific coord
+        # obtained by the just tracked movement plotted from the actual Hessian and Gradient values and the previous calculated coord)
+        # we extrapolate the w and b parameters to insert in the J loss-function
+
         w, b = v[0:-1], v[-1]
         w = vcol(w)
         n = self.fi_x.shape[1]
-        regularization = (self.lambda_ / 2) * np.sum(w ** 2)
-        loss_c0 = 0
-        loss_c1 = 0
 
-        # Calcolo della loss per ciascuna classe
+        regularization = (self.lambda_ / 2) * np.sum(w ** 2)
+
+        # it's a sample way to apply the math transformation z = 2c - 1
         for i in range(n):
-            if self.LTR[i] == 1:
+
+            if (self.LTR[i:i + 1] == 1):
                 zi = 1
                 loss_c1 += np.logaddexp(0, -zi * (np.dot(w.T, self.fi_x[:, i:i + 1]) + b))
             else:
                 zi = -1
                 loss_c0 += np.logaddexp(0, -zi * (np.dot(w.T, self.fi_x[:, i:i + 1]) + b))
 
-        # Calcolo della funzione obiettivo
         J = regularization + (self.piT / self.nT) * loss_c1 + (1 - self.piT) / self.nF * loss_c0
         grad = self.grad_funct(v)
         return J, grad
 
     # Funzione per addestrare il modello Quadratic Logistic Regression
     def train(self, DTR, LTR):
+        # print("In train")
         self.DTR = DTR
         self.LTR = LTR
         self.nt = DTR[:, LTR == 1].shape[1]
         self.nf = DTR.shape[1] - self.nt
 
-        # Calcolo delle feature espansione
+        # print("nt: "+str(self.nt))
+        # print("nf: "+str(self.nf))
+
         def vecxxT(x):
             x = x[:, None]
             xxT = x.dot(x.T).reshape(x.size ** 2, order='F')
             return xxT
 
+        n_features = DTR.shape[1]
+        # Creare una matrice vuota per contenere le caratteristiche espans
         expanded_DTR = np.apply_along_axis(vecxxT, 0, DTR)
+        # expanded_DTE = numpy.apply_along_axis(vecxxT, 0, Dte)
         self.fi_x = np.vstack([expanded_DTR, DTR])
 
-        # Inizializzazione dei parametri e del gradiente
+        # phi_DTE = numpy.vstack([expanded_DTE, Dte])
+
         x0 = np.zeros(self.fi_x.shape[0] + 1)
+
         self.nT = len(np.where(LTR == 1)[0])
         self.nF = len(np.where(LTR == 0)[0])
         self.grad_funct = self.gradient_test(self.fi_x, self.LTR, self.lambda_, self.piT, self.nt, self.nf)
 
-        # Ottimizzazione dei parametri utilizzando L-BFGS
-        params, _, _ = sc.optimize.fmin_l_bfgs_b(self.quad_logreg_obj, x0)
+        # print("sono dentro")
+
+        # optimize.fmin_l_bfgs_b looks for secod order info to search direction pt and then find an acceptable step size at for pt
+        # I set approx_grad=True so the function will generate an approximated gradient for each iteration
+        params, f_min, _ = sc.optimize.fmin_l_bfgs_b(self.quad_logreg_obj, x0)
+        # print("sono uscito")
+        # the function found the coord for the minimal value of logreg_obj and they conrespond to w and b
+
         self.b = params[-1]
+
         self.w = np.array(params[0:-1])
+
         self.S = []
 
         return self.b, self.w

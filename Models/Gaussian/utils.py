@@ -11,13 +11,10 @@ def vcol(row):
 
 
 def createCov(D):
-    mu = 0
     C = 0
     mu = D.mean(1)
     for i in range(D.shape[1]):
-        C = C + np.dot(D[:, i:i + 1] - mu, (D[:, i:i + 1] - mu).T)  # scalar product using numpy
-        # with this formule we have just centered the data (PCA on NON CENTERED DATA is quite an unsafe operation)
-
+        C = C + np.dot(D[:, i:i + 1] - mu, (D[:, i:i + 1] - mu).T)
     C = C / float(D.shape[1])  # where the divider is the dimension N of our data
     return C
 
@@ -427,36 +424,4 @@ def LOO(D, L):
 
     return np.array(MVG_pred), np.array(NB_pred), np.array(TCG_pred), np.array(TCNBG_pred)
 
-# Prova funzioni:
 
-
-#     pred_MVG = MVG_approach(DTR,LTR,DTE)
-
-#     #for so few data we can apply the same code as used for MVG approach and make the S_matrices diagonal using a np.eye()
-#     pred_Naive_Bayes = NB_approach(DTR,LTR,DTE)
-
-#     pred_Tied_cov_Gauss = TCG_approach(DTR,LTR,DTE)
-
-#     #accuracy evaluation system
-#     print(accuracy(pred_MVG,LTE)[0]*100)
-#     print(accuracy(pred_Naive_Bayes,LTE)[0]*100)
-#     print(accuracy(pred_Tied_cov_Gauss,LTE)[0]*100)
-
-
-#     #let's try with Leave One Out EVALUATION system (Leave One Out variant)
-
-#     #NOT SURE THIS IS THE RIGHT SOLUTION EXPECIALLY ABOUT WHAT KIND OF DATASET WE NEED TO USE!!!!!
-#     MVG_pred,NB_pred,TCG_pred,TCNBG_pred = LOO(DTR,LTR)
-
-#     MVG_acc,MVG_err = accuracy(MVG_pred, L)
-
-#     NB_acc,NB_err = accuracy(NB_pred,L)
-
-#     TCG_acc,TCG_err = accuracy(TCG_pred, L)
-
-#     TCNBG_acc,TCNBG_err = accuracy(TCNBG_pred, L)
-
-#     print("LLO_MVG_err_ratio: ",(1-MVG_acc)*100)
-#     print("LLO_NB_err_ratio: ",(1-NB_acc)*100)
-#     print("LLO_TCG_err_ratio: ",(1-TCG_acc)*100)
-#     print("LLO_TCNBG_err_ratio: ",(1-TCNBG_acc)*100)

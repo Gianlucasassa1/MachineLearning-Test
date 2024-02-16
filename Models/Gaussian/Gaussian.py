@@ -1,11 +1,13 @@
 from . import utils as model_utils
 import numpy as np
 
+
 class GaussianClassifier:
     """
     Classe per la classificazione basata su modelli Gaussiani.
     Supporta diverse varianti del modello Gaussiano.
     """
+
     def __init__(self, mode, prior, cost_fp, cost_fn):
         """
         Inizializza il classificatore.
@@ -38,17 +40,19 @@ class GaussianClassifier:
         elif self.mode == "NB":
             self.means, covariance_matrices_temp, _ = model_utils.MVG_model(DTR, LTR)
             for i in range(np.array(covariance_matrices_temp).shape[0]):
-                covariance_matrices_temp[i] = covariance_matrices_temp[i]*np.eye(covariance_matrices_temp[i].shape[0],covariance_matrices_temp[i].shape[1])
+                covariance_matrices_temp[i] = covariance_matrices_temp[i] * np.eye(covariance_matrices_temp[i].shape[0],
+                                                                                   covariance_matrices_temp[i].shape[1])
             self.covariance_matrices = covariance_matrices_temp
 
         elif self.mode == "TCG":
             # Per TCG, utilizza una matrice di covarianza condivisa tra le classi
             self.means, covariance_matrices_temp = model_utils.TCG_model(DTR, LTR)
             self.covariance_matrices = [covariance_matrices_temp] * 3
-        
+
         elif self.mode == "TCGNB":
             self.means, covariance_matrices_temp = model_utils.TCG_model(DTR, LTR)
-            covariance_matrices_temp = covariance_matrices_temp * np.eye(covariance_matrices_temp.shape[0],covariance_matrices_temp.shape[1])
+            covariance_matrices_temp = covariance_matrices_temp * np.eye(covariance_matrices_temp.shape[0],
+                                                                         covariance_matrices_temp.shape[1])
             self.covariance_matrices = [covariance_matrices_temp] * 3
 
     def compute_scores(self, DTE):
@@ -61,7 +65,8 @@ class GaussianClassifier:
         Returns:
         Log-likelihood ratios per i dati di test.
         """
-        llr = model_utils.loglikelihoods(DTE, self.means, self.covariance_matrices, [1 - self.effective_prior, self.effective_prior])
+        llr = model_utils.loglikelihoods(DTE, self.means, self.covariance_matrices,
+                                         [1 - self.effective_prior, self.effective_prior])
         return llr
 
     def predict(self, class_probabilities):

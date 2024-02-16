@@ -10,7 +10,7 @@ def mRow(v):
     return v.reshape((1, v.size))
 
 
-class SVMClass:
+class SVMClassifier:
 
     def __init__(self, K, C, piT):
         self.K = K
